@@ -1,0 +1,9 @@
+.git
+.github
+.gitignore
+README.md
+dist
+*.zip
+*.exe
+*.test
+*.out

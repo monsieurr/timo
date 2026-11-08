@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121418">
+  <title>timo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="grain-field" aria-hidden="true">
+    <div class="grain-field__light"></div>
+    <div class="grain-field__texture"></div>
+  </div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#timer" aria-label="timo, timer">timo<span class="brand-dot">.</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <button type="button" class="nav-tab active" data-tab="timer" aria-current="page">Timer</button>
+        <button type="button" class="nav-tab" data-tab="stats">Statistics</button>
+        <button type="button" class="nav-tab" data-tab="settings">Settings</button>
+      </nav>
+    </header>
+
+    <main>
+      <div id="error" role="alert" class="error" hidden></div>
+
+      <section class="tab-panel timer-panel" id="timer-panel" aria-label="Timer">
+        <div class="timer-content">
+          <div class="phase-switch" aria-label="Session mode">
+            <button type="button" data-phase="focus" class="selected">Focus</button>
+            <button type="button" data-phase="break">Short break</button>
+            <button type="button" data-phase="long_break">Long break</button>
+          </div>
+
+          <div id="clock" class="clock" role="timer" aria-live="off" aria-label="25 minutes remaining"><span id="clock-minutes">25</span><span class="clock-separator" aria-hidden="true">:</span><span id="clock-seconds">00</span></div>
+          <div id="timer-state" class="timer-state">Ready</div>
+
+          <div class="progress-track" aria-hidden="true"><div id="clock-progress" class="progress-fill"></div></div>
+
+          <div class="timer-actions">
+            <button type="button" class="action-primary" id="main-action">Start</button>
+            <button type="button" class="text-button" id="reset-action" title="Reset current session">Reset</button>
+            <button type="button" class="text-button" id="skip-action" title="Skip to next phase">Skip</button>
+          </div>
+          <div id="cycle-label" class="cycle-label">Session 1 / 4</div>
+        </div>
+      </section>
+
+      <section class="tab-panel content-panel" id="stats-panel" aria-label="Statistics" hidden>
+        <div class="section-header">
+          <h1>Statistics</h1>
+          <div class="stats-tools">
+            <select id="range" aria-label="Statistics date range">
+              <option value="7">7 days</option>
+              <option value="30">30 days</option>
+              <option value="all">All time</option>
+            </select>
+            <button type="button" class="export-button" id="export-csv" title="Export completed sessions in the selected date range">Export CSV</button>
+            <button type="button" class="export-button" id="export-json" title="Back up all data and settings">Backup JSON</button>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><span class="stat-label">Focus time</span><strong id="stat-minutes">0<span>m</span></strong></div>
+          <div class="stat"><span class="stat-label">Sessions</span><strong id="stat-sessions">0</strong></div>
+          <div class="stat"><span class="stat-label">Current streak</span><strong id="stat-streak">0<span>d</span></strong></div>
+        </div>
+        <section class="chart-section" aria-label="Focus activity">
+          <div class="subheading"><h2>Activity</h2><span id="chart-subtitle">Focus minutes per day</span></div>
+          <div class="chart-wrap">
+            <div class="chart" id="chart" aria-label="Daily focus minutes chart"></div>
+          </div>
+          <div class="chart-axis"><span id="chart-from"></span><span id="chart-to"></span></div>
+          <p class="chart-detail" id="chart-detail" role="status" hidden></p>
+        </section>
+        <section class="history-section" aria-label="Recent sessions">
+          <div class="subheading"><h2>Recent sessions</h2></div>
+          <div id="history" class="history"></div>
+        </section>
+      </section>
+
+      <section class="tab-panel content-panel" id="settings-panel" aria-label="Settings" hidden>
+        <div class="section-header"><h1>Settings</h1></div>
+        <form id="settings-form">
+          <div class="settings-section">
+            <h2>Duration</h2>
+            <div class="settings-grid">
+              <label>Focus <span>min</span><input id="focus-minutes" type="number" min="1" max="240" required></label>
+              <label>Short break <span>min</span><input id="break-minutes" type="number" min="1" max="120" required></label>
+              <label>Long break <span>min</span><input id="long-break-minutes" type="number" min="1" max="120" required></label>
+              <label>Long break every <span>sessions</span><input id="long-break-every" type="number" min="1" max="20" required></label>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>Appearance</h2>
+            <div class="appearance-grid">
+              <label class="select-label" for="theme-mode">Mode
+                <select id="theme-mode"><option value="dark">Dark</option><option value="light">Light</option><option value="system">System</option></select>
+              </label>
+              <div class="colour-control">
+                <label for="accent">Accent colour</label>
+                <div class="color-picker"><input type="color" id="accent" aria-label="Choose accent colour"><span id="accent-label">#C0B2E8</span></div>
+                <div class="color-presets" aria-label="Colour presets">
+                  <button type="button" data-color="#C0B2E8" style="--swatch:#C0B2E8" aria-label="Lilac"></button>
+                  <button type="button" data-color="#86B9AF" style="--swatch:#86B9AF" aria-label="Sage"></button>
+                  <button type="button" data-color="#D7A47C" style="--swatch:#D7A47C" aria-label="Sand"></button>
+                  <button type="button" data-color="#8EAED6" style="--swatch:#8EAED6" aria-label="Blue"></button>
+                  <button type="button" data-color="#D49AA5" style="--swatch:#D49AA5" aria-label="Rose"></button>
+                </div>
+              </div>
+              <label class="motion-label" for="grain-motion"><span>Animated grain <small>Slow, subtle background movement</small></span><input type="checkbox" id="grain-motion"></label>
+            </div>
+          </div>
+          <div class="form-footer"><button class="action-primary" type="submit">Save changes</button><span id="saved-label" role="status"></span></div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

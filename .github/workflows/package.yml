@@ -1,0 +1,53 @@
+name: Package
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.3'
+      - name: Build Windows binaries
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          go build -trimpath -o dist/timo-windows-amd64.exe .
+          go build -trimpath -ldflags '-H=windowsgui -X main.desktopBuild=true' -o dist/timo-app-windows-amd64.exe .
+      - name: Package installer (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 7\ISCC.exe'
+          if (!(Test-Path $iscc)) { $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' }
+          if (!(Test-Path $iscc)) { throw 'Inno Setup not found on runner: install it before compiling.' }
+          & $iscc packaging\windows\Timo.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timo-windows-installer
+          path: release/timo-setup-windows-amd64.exe
+          if-no-files-found: error
+  macos-app:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [arm64, amd64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.3'
+      - name: Build macOS binaries
+        run: |
+          mkdir -p dist
+          GOOS=darwin GOARCH=${{ matrix.arch }} go build -trimpath -o dist/timo-darwin-${{ matrix.arch }} .
+          GOOS=darwin GOARCH=${{ matrix.arch }} go build -trimpath -ldflags '-X main.desktopBuild=true' -o dist/timo-app-darwin-${{ matrix.arch }} .
+          sh packaging/macos/make-app.sh ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timo-macos-${{ matrix.arch }}
+          path: release/timo-macos-${{ matrix.arch }}.app.zip
+          if-no-files-found: error

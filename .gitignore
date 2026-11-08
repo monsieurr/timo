@@ -1,0 +1,38 @@
+
+# Compiled binaries
+/dist/
+/build/
+/timo
+/timo.exe
+*.test
+*.exe
+*.out
+
+# Generated installers and archives
+*.zip
+*.dmg
+*.msi
+*.app/
+Output/
+
+# Local application data
+/data.json
+/data.json.lock
+*.log
+
+# Test and coverage outputs
+coverage.txt
+coverage.html
+*.prof
+*.coverprofile
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*~
